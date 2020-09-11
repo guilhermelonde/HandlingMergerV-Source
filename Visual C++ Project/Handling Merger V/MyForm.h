@@ -40,11 +40,11 @@ namespace HandlingMergerV {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::Label^  label1;
+	private: System::Windows::Forms::Label^ label1;
 	protected:
-	private: System::Windows::Forms::Label^  label2;
-	private: System::Windows::Forms::Button^  SelectMod;
-	private: System::Windows::Forms::Button^  SelectHandling;
+	private: System::Windows::Forms::Label^ label2;
+	private: System::Windows::Forms::Button^ SelectMod;
+	private: System::Windows::Forms::Button^ SelectHandling;
 
 
 
@@ -56,43 +56,44 @@ namespace HandlingMergerV {
 
 
 
-	private: System::Windows::Forms::Label^  DirF1;
-	private: System::Windows::Forms::Label^  DirF2;
-	private: System::Windows::Forms::CheckedListBox^  CommonList;
+	private: System::Windows::Forms::Label^ DirF1;
+	private: System::Windows::Forms::Label^ DirF2;
+	private: System::Windows::Forms::CheckedListBox^ CommonList;
 
-	private: System::Windows::Forms::Button^  SelectAll;
-	private: System::Windows::Forms::Button^  UnselectAll;
-	private: System::Windows::Forms::CheckedListBox^  CommonVarList;
+	private: System::Windows::Forms::Button^ SelectAll;
+	private: System::Windows::Forms::Button^ UnselectAll;
+	private: System::Windows::Forms::CheckedListBox^ CommonVarList;
 
-	private: System::Windows::Forms::Button^  UnselectAllVar;
-	private: System::Windows::Forms::Button^  SelectAllVar;
+	private: System::Windows::Forms::Button^ UnselectAllVar;
+	private: System::Windows::Forms::Button^ SelectAllVar;
 
-	private: System::Windows::Forms::Button^  Merge;
-	private: System::Windows::Forms::TabControl^  tabControl1;
-	private: System::Windows::Forms::TabPage^  tabPage1;
-	private: System::Windows::Forms::GroupBox^  groupBox2;
-	private: System::Windows::Forms::GroupBox^  groupBox1;
-	private: System::Windows::Forms::TabPage^  tabPage2;
-	private: System::Windows::Forms::GroupBox^  groupBox3;
-	private: System::Windows::Forms::Button^  UnselectAllInsert;
-	private: System::Windows::Forms::CheckedListBox^  UncommonList;
-	private: System::Windows::Forms::Button^  SelectAllInsert;
-	private: System::Windows::Forms::Label^  label3;
-	private: System::Windows::Forms::Label^  label7;
-	private: System::Windows::Forms::Label^  label6;
-	private: System::Windows::Forms::Button^  Insert;
-	private: System::Windows::Forms::Label^  label4;
-	private: System::Windows::Forms::GroupBox^  groupBox4;
-	private: System::Windows::Forms::Button^  UnselectAllVarVar;
-	private: System::Windows::Forms::Button^  SelectAllVarVar;
-	private: System::Windows::Forms::Button^  UnselectAllVerVeh;
-	private: System::Windows::Forms::Button^  SelectAllVarVeh;
-	private: System::Windows::Forms::Button^  InsertVar;
-	private: System::Windows::Forms::Label^  label5;
-	private: System::Windows::Forms::CheckedListBox^  UncommonVarVar;
-	private: System::Windows::Forms::CheckedListBox^  UncommonVarVehicles;
+	private: System::Windows::Forms::Button^ Merge;
+	private: System::Windows::Forms::TabControl^ tabControl1;
+	private: System::Windows::Forms::TabPage^ tabPage1;
+	private: System::Windows::Forms::GroupBox^ groupBox2;
+	private: System::Windows::Forms::GroupBox^ groupBox1;
+	private: System::Windows::Forms::TabPage^ tabPage2;
+	private: System::Windows::Forms::GroupBox^ groupBox3;
+	private: System::Windows::Forms::Button^ UnselectAllInsert;
+	private: System::Windows::Forms::CheckedListBox^ UncommonList;
+	private: System::Windows::Forms::Button^ SelectAllInsert;
+	private: System::Windows::Forms::Label^ label3;
+	private: System::Windows::Forms::Label^ label7;
+	private: System::Windows::Forms::Label^ label6;
+	private: System::Windows::Forms::Button^ Insert;
+	private: System::Windows::Forms::Label^ label4;
+	private: System::Windows::Forms::GroupBox^ groupBox4;
+	private: System::Windows::Forms::Button^ UnselectAllVarVar;
+	private: System::Windows::Forms::Button^ SelectAllVarVar;
+	private: System::Windows::Forms::Button^ UnselectAllVerVeh;
+	private: System::Windows::Forms::Button^ SelectAllVarVeh;
+	private: System::Windows::Forms::Button^ InsertVar;
+	private: System::Windows::Forms::Label^ label5;
+	private: System::Windows::Forms::CheckedListBox^ UncommonVarVar;
+	private: System::Windows::Forms::CheckedListBox^ UncommonVarVehicles;
 
-
+	private: CheckedListBox^ currentCLB;
+	private: int currentSelectedInCLB;
 
 
 
@@ -108,7 +109,7 @@ namespace HandlingMergerV {
 		/// <summary>
 		/// Variável de designer necessária.
 		/// </summary>
-		System::ComponentModel::Container ^components;
+		System::ComponentModel::Container^ components;
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -117,7 +118,7 @@ namespace HandlingMergerV {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(MyForm::typeid));
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MyForm::typeid));
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->SelectMod = (gcnew System::Windows::Forms::Button());
@@ -246,6 +247,7 @@ namespace HandlingMergerV {
 			this->CommonList->Name = L"CommonList";
 			this->CommonList->Size = System::Drawing::Size(344, 304);
 			this->CommonList->TabIndex = 2;
+			this->CommonList->MouseDown += gcnew Windows::Forms::MouseEventHandler(this, &MyForm::CommonList_MouseDown);
 			// 
 			// SelectAll
 			// 
@@ -505,6 +507,7 @@ namespace HandlingMergerV {
 			this->UncommonVarVehicles->Name = L"UncommonVarVehicles";
 			this->UncommonVarVehicles->Size = System::Drawing::Size(237, 289);
 			this->UncommonVarVehicles->TabIndex = 0;
+			this->UncommonVarVehicles->MouseDown += gcnew Windows::Forms::MouseEventHandler(this, &MyForm::UncommonVarVehicles_MouseDown);
 			// 
 			// label4
 			// 
@@ -560,6 +563,7 @@ namespace HandlingMergerV {
 			this->UncommonList->Name = L"UncommonList";
 			this->UncommonList->Size = System::Drawing::Size(239, 289);
 			this->UncommonList->TabIndex = 0;
+			this->UncommonList->MouseDown += gcnew Windows::Forms::MouseEventHandler(this, &MyForm::UncommonList_MouseDown);
 			// 
 			// SelectAllInsert
 			// 
@@ -616,7 +620,7 @@ namespace HandlingMergerV {
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackColor = System::Drawing::Color::WhiteSmoke;
-			this->ClientSize = System::Drawing::Size(884, 492);
+			this->ClientSize = System::Drawing::Size(884, 491);
 			this->Controls->Add(this->tabControl1);
 			this->Controls->Add(this->label6);
 			this->Controls->Add(this->DirF2);
@@ -648,237 +652,316 @@ namespace HandlingMergerV {
 		}
 #pragma endregion
 
-private: void openF1(String^ dir) {
-	if (dir == "")
-		return;
-	this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
-	DirF1->Text = dir;
-	CommonList->Items->Clear();
-	std::string dirS = msclr::interop::marshal_as<std::string>(dir);
-	MTObj.setF1(dirS);
-	std::list<std::string> L = MTObj.common();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		CommonList->Items->Add(i);
-		L.pop_front();
+	private: void openF1(String^ dir) {
+		if (dir == "")
+			return;
+		this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
+		DirF1->Text = dir;
+		CommonList->Items->Clear();
+		std::string dirS = msclr::interop::marshal_as<std::string>(dir);
+		MTObj.setF1(dirS);
+		std::list<std::string> L = MTObj.common();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			CommonList->Items->Add(i);
+			L.pop_front();
+		}
+		CommonVarList->Items->Clear();
+		L = MTObj.getVar();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			CommonVarList->Items->Add(i);
+			L.pop_front();
+		}
+		UncommonList->Items->Clear();
+		L = MTObj.uncommon();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			UncommonList->Items->Add(i);
+			L.pop_front();
+		}
+		UncommonVarVar->Items->Clear();
+		L = MTObj.uncommonVarVar();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			UncommonVarVar->Items->Add(i);
+			L.pop_front();
+		}
+		UncommonVarVehicles->Items->Clear();
+		L = MTObj.uncommonVarVeh();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			UncommonVarVehicles->Items->Add(i);
+			L.pop_front();
+		}
+		this->Cursor = System::Windows::Forms::Cursors::Default;
 	}
-	CommonVarList->Items->Clear();
-	L = MTObj.getVar();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		CommonVarList->Items->Add(i);
-		L.pop_front();
-	}
-	UncommonList->Items->Clear();
-	L = MTObj.uncommon();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		UncommonList->Items->Add(i);
-		L.pop_front();
-	}
-	UncommonVarVar->Items->Clear();
-	L = MTObj.uncommonVarVar();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		UncommonVarVar->Items->Add(i);
-		L.pop_front();
-	}
-	UncommonVarVehicles->Items->Clear();
-	L = MTObj.uncommonVarVeh();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		UncommonVarVehicles->Items->Add(i);
-		L.pop_front();
-	}
-	this->Cursor = System::Windows::Forms::Cursors::Default;
-}
 
-private: System::Void SelectMod_Click(System::Object^  sender, System::EventArgs^  e) {
-	OpenFileDialog^ O = gcnew OpenFileDialog;
-	O->Title = "Select the file with your handling data";
-	O->ShowDialog();
-	String^ dir = O->FileName;
-	openF1(dir);
-}
+	private: System::Void SelectMod_Click(System::Object^ sender, System::EventArgs^ e) {
+		OpenFileDialog^ O = gcnew OpenFileDialog;
+		O->Title = "Select the file with your handling data";
+		O->ShowDialog();
+		String^ dir = O->FileName;
+		openF1(dir);
+	}
 
-private: void openF2(String^ dir) {
-	if (dir == "")
-		return;
-	this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
-	DirF2->Text = dir;
-	CommonList->Items->Clear();
-	std::string dirS = msclr::interop::marshal_as<std::string>(dir);
-	MTObj.setF2(dirS);
-	std::list<std::string> L = MTObj.common();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		CommonList->Items->Add(i);
-		L.pop_front();
+	private: void openF2(String^ dir) {
+		if (dir == "")
+			return;
+		this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
+		DirF2->Text = dir;
+		CommonList->Items->Clear();
+		std::string dirS = msclr::interop::marshal_as<std::string>(dir);
+		MTObj.setF2(dirS);
+		std::list<std::string> L = MTObj.common();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			CommonList->Items->Add(i);
+			L.pop_front();
+		}
+		UncommonList->Items->Clear();
+		L = MTObj.uncommon();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			UncommonList->Items->Add(i);
+			L.pop_front();
+		}
+		UncommonVarVar->Items->Clear();
+		L = MTObj.uncommonVarVar();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			UncommonVarVar->Items->Add(i);
+			L.pop_front();
+		}
+		UncommonVarVehicles->Items->Clear();
+		L = MTObj.uncommonVarVeh();
+		while (!L.empty()) {
+			String^ i = gcnew String(L.front().c_str());
+			UncommonVarVehicles->Items->Add(i);
+			L.pop_front();
+		}
+		this->Cursor = System::Windows::Forms::Cursors::Default;
 	}
-	UncommonList->Items->Clear();
-	L = MTObj.uncommon();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		UncommonList->Items->Add(i);
-		L.pop_front();
-	}
-	UncommonVarVar->Items->Clear();
-	L = MTObj.uncommonVarVar();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		UncommonVarVar->Items->Add(i);
-		L.pop_front();
-	}
-	UncommonVarVehicles->Items->Clear();
-	L = MTObj.uncommonVarVeh();
-	while (!L.empty()) {
-		String^ i = gcnew String(L.front().c_str());
-		UncommonVarVehicles->Items->Add(i);
-		L.pop_front();
-	}
-	this->Cursor = System::Windows::Forms::Cursors::Default;
-}
 
-private: System::Void SelectHandling_Click(System::Object^  sender, System::EventArgs^  e) {
-	OpenFileDialog^ O = gcnew OpenFileDialog;
-	O->Title = "Select the handling.meta you already use";
-	O->ShowDialog();
-	String^ dir = O->FileName;
-	openF2(dir);
-}
-private: System::Void SelectAll_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = CommonList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		CommonList->SetItemChecked(i, true);
+	private: System::Void SelectHandling_Click(System::Object^ sender, System::EventArgs^ e) {
+		OpenFileDialog^ O = gcnew OpenFileDialog;
+		O->Title = "Select the handling.meta you already use";
+		O->ShowDialog();
+		String^ dir = O->FileName;
+		openF2(dir);
 	}
-}
-private: System::Void UnselectAll_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = CommonList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		CommonList->SetItemChecked(i, false);
-	}
-}
-private: System::Void Merge_Click(System::Object^  sender, System::EventArgs^  e) {
-	this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
-	std::list<int> Vehicles, Variables;
-	int n = CommonList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		if (CommonList->GetItemChecked(i)) {
-			Vehicles.push_back(i);
+	private: System::Void SelectAll_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = CommonList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			CommonList->SetItemChecked(i, true);
 		}
 	}
-	n = CommonVarList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		if (CommonVarList->GetItemChecked(i)) {
-			Variables.push_back(i);
+	private: System::Void UnselectAll_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = CommonList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			CommonList->SetItemChecked(i, false);
 		}
 	}
-	MTObj.merge(Vehicles, Variables);
-	CommonList->Items->Clear();
-	CommonVarList->Items->Clear();
-	UncommonList->Items->Clear();
-	UncommonVarVar->Items->Clear();
-	UncommonVarVehicles->Items->Clear();
-	openF1(DirF1->Text);
-	openF2(DirF2->Text);
-	this->Cursor = System::Windows::Forms::Cursors::Default;
-	MessageBox::Show("Merged!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
-}
-private: System::Void MyForm_Load(System::Object^  sender, System::EventArgs^  e) {
-}
-private: System::Void UnselectAllVar_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = CommonVarList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		CommonVarList->SetItemChecked(i, false);
+	private: System::Void Merge_Click(System::Object^ sender, System::EventArgs^ e) {
+		this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
+		std::list<int> Vehicles, Variables;
+		int n = CommonList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			if (CommonList->GetItemChecked(i)) {
+				Vehicles.push_back(i);
+			}
+		}
+		n = CommonVarList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			if (CommonVarList->GetItemChecked(i)) {
+				Variables.push_back(i);
+			}
+		}
+		MTObj.merge(Vehicles, Variables);
+		CommonList->Items->Clear();
+		CommonVarList->Items->Clear();
+		UncommonList->Items->Clear();
+		UncommonVarVar->Items->Clear();
+		UncommonVarVehicles->Items->Clear();
+		openF1(DirF1->Text);
+		openF2(DirF2->Text);
+		this->Cursor = System::Windows::Forms::Cursors::Default;
+		MessageBox::Show("Merged!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
 	}
-}
-private: System::Void SelectAllVar_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = CommonVarList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		CommonVarList->SetItemChecked(i, true);
+	private: System::Void MyForm_Load(System::Object^ sender, System::EventArgs^ e) {
 	}
-}
-private: System::Void UnselectAllInsert_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = UncommonList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		UncommonList->SetItemChecked(i, false);
-	}
-}
-private: System::Void SelectAllInsert_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = UncommonList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		UncommonList->SetItemChecked(i, true);
-	}
-}
-private: System::Void Insert_Click(System::Object^  sender, System::EventArgs^  e) {
-	this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
-	std::list<int> Vehicles;
-	int n = UncommonList->Items->Count;
-	for (int i = 0; i < n; i++) {
-		if (UncommonList->GetItemChecked(i)) {
-			Vehicles.push_back(i);
+	private: System::Void UnselectAllVar_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = CommonVarList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			CommonVarList->SetItemChecked(i, false);
 		}
 	}
-	MTObj.insert(Vehicles);
-	CommonList->Items->Clear();
-	CommonVarList->Items->Clear();
-	UncommonList->Items->Clear();
-	UncommonVarVar->Items->Clear();
-	UncommonVarVehicles->Items->Clear();
-	openF1(DirF1->Text);
-	openF2(DirF2->Text);
-	this->Cursor = System::Windows::Forms::Cursors::Default;
-	MessageBox::Show("Added!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
-}
-private: System::Void SelectAllVarVeh_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = UncommonVarVehicles->Items->Count;
-	for (int i = 0; i < n; i++) {
-		UncommonVarVehicles->SetItemChecked(i, true);
-	}
-}
-private: System::Void UnselectAllVerVeh_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = UncommonVarVehicles->Items->Count;
-	for (int i = 0; i < n; i++) {
-		UncommonVarVehicles->SetItemChecked(i, false);
-	}
-}
-private: System::Void SelectAllVarVar_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = UncommonVarVar->Items->Count;
-	for (int i = 0; i < n; i++) {
-		UncommonVarVar->SetItemChecked(i, true);
-	}
-}
-private: System::Void UnselectAllVarVar_Click(System::Object^  sender, System::EventArgs^  e) {
-	int n = UncommonVarVar->Items->Count;
-	for (int i = 0; i < n; i++) {
-		UncommonVarVar->SetItemChecked(i, false);
-	}
-}
-private: System::Void InsertVar_Click(System::Object^  sender, System::EventArgs^  e) {
-	this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
-	std::list<int> Vehicles, Variables;
-	int n = UncommonVarVehicles->Items->Count;
-	for (int i = 0; i < n; i++) {
-		if (UncommonVarVehicles->GetItemChecked(i)) {
-			Vehicles.push_back(i);
+	private: System::Void SelectAllVar_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = CommonVarList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			CommonVarList->SetItemChecked(i, true);
 		}
 	}
-	n = UncommonVarVar->Items->Count;
-	for (int i = 0; i < n; i++) {
-		if (UncommonVarVar->GetItemChecked(i)) {
-			Variables.push_back(i);
+	private: System::Void UnselectAllInsert_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = UncommonList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			UncommonList->SetItemChecked(i, false);
 		}
 	}
-	MTObj.insertVar(Vehicles, Variables);
-	CommonList->Items->Clear();
-	CommonVarList->Items->Clear();
-	UncommonList->Items->Clear();
-	UncommonVarVar->Items->Clear();
-	UncommonVarVehicles->Items->Clear();
-	openF1(DirF1->Text);
-	openF2(DirF2->Text);
-	this->Cursor = System::Windows::Forms::Cursors::Default;
-	MessageBox::Show("Added!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
-}
-};
+	private: System::Void SelectAllInsert_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = UncommonList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			UncommonList->SetItemChecked(i, true);
+		}
+	}
+	private: System::Void Insert_Click(System::Object^ sender, System::EventArgs^ e) {
+		this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
+		std::list<int> Vehicles;
+		int n = UncommonList->Items->Count;
+		for (int i = 0; i < n; i++) {
+			if (UncommonList->GetItemChecked(i)) {
+				Vehicles.push_back(i);
+			}
+		}
+		MTObj.insert(Vehicles);
+		CommonList->Items->Clear();
+		CommonVarList->Items->Clear();
+		UncommonList->Items->Clear();
+		UncommonVarVar->Items->Clear();
+		UncommonVarVehicles->Items->Clear();
+		openF1(DirF1->Text);
+		openF2(DirF2->Text);
+		this->Cursor = System::Windows::Forms::Cursors::Default;
+		MessageBox::Show("Added!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
+	}
+	private: System::Void SelectAllVarVeh_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = UncommonVarVehicles->Items->Count;
+		for (int i = 0; i < n; i++) {
+			UncommonVarVehicles->SetItemChecked(i, true);
+		}
+	}
+	private: System::Void UnselectAllVerVeh_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = UncommonVarVehicles->Items->Count;
+		for (int i = 0; i < n; i++) {
+			UncommonVarVehicles->SetItemChecked(i, false);
+		}
+	}
+	private: System::Void SelectAllVarVar_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = UncommonVarVar->Items->Count;
+		for (int i = 0; i < n; i++) {
+			UncommonVarVar->SetItemChecked(i, true);
+		}
+	}
+	private: System::Void UnselectAllVarVar_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n = UncommonVarVar->Items->Count;
+		for (int i = 0; i < n; i++) {
+			UncommonVarVar->SetItemChecked(i, false);
+		}
+	}
+	private: System::Void InsertVar_Click(System::Object^ sender, System::EventArgs^ e) {
+		this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
+		std::list<int> Vehicles, Variables;
+		int n = UncommonVarVehicles->Items->Count;
+		for (int i = 0; i < n; i++) {
+			if (UncommonVarVehicles->GetItemChecked(i)) {
+				Vehicles.push_back(i);
+			}
+		}
+		n = UncommonVarVar->Items->Count;
+		for (int i = 0; i < n; i++) {
+			if (UncommonVarVar->GetItemChecked(i)) {
+				Variables.push_back(i);
+			}
+		}
+		MTObj.insertVar(Vehicles, Variables);
+		CommonList->Items->Clear();
+		CommonVarList->Items->Clear();
+		UncommonList->Items->Clear();
+		UncommonVarVar->Items->Clear();
+		UncommonVarVehicles->Items->Clear();
+		openF1(DirF1->Text);
+		openF2(DirF2->Text);
+		this->Cursor = System::Windows::Forms::Cursors::Default;
+		MessageBox::Show("Added!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
+	}
+
+	private: System::Void CommonList_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e)
+	{
+		if (e->Button == System::Windows::Forms::MouseButtons::Right)
+		{
+			currentSelectedInCLB = CommonList->IndexFromPoint(CommonList->PointToClient(this->MousePosition));
+			currentCLB = CommonList;
+			if (currentSelectedInCLB == -1)
+				return;
+			System::Windows::Forms::ContextMenu^ cms = gcnew System::Windows::Forms::ContextMenu;
+			cms->MenuItems->Add("Mark all from this category", gcnew System::EventHandler(this, &MyForm::CommonList_LeftMarkClick));
+			cms->MenuItems->Add("Unmark all from this category", gcnew System::EventHandler(this, &MyForm::CommonList_LeftUnmarkClick));
+			cms->Show(this, this->PointToClient(this->MousePosition));
+		}
+	}
+
+	private: System::Void UncommonList_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		if (e->Button == System::Windows::Forms::MouseButtons::Right)
+		{
+			currentSelectedInCLB = UncommonList->IndexFromPoint(UncommonList->PointToClient(this->MousePosition));
+			currentCLB = UncommonList;
+			if (currentSelectedInCLB == -1)
+				return;
+			System::Windows::Forms::ContextMenu^ cms = gcnew System::Windows::Forms::ContextMenu;
+			cms->MenuItems->Add("Mark all from this category", gcnew System::EventHandler(this, &MyForm::CommonList_LeftMarkClick));
+			cms->MenuItems->Add("Unmark all from this category", gcnew System::EventHandler(this, &MyForm::CommonList_LeftUnmarkClick));
+			cms->Show(this, this->PointToClient(this->MousePosition));
+		}
+	}
+
+	private: System::Void UncommonVarVehicles_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		if (e->Button == System::Windows::Forms::MouseButtons::Right)
+		{
+			currentSelectedInCLB = UncommonVarVehicles->IndexFromPoint(UncommonVarVehicles->PointToClient(this->MousePosition));
+			currentCLB = UncommonVarVehicles;
+			if (currentSelectedInCLB == -1)
+				return;
+			System::Windows::Forms::ContextMenu^ cms = gcnew System::Windows::Forms::ContextMenu;
+			cms->MenuItems->Add("Mark all from this category", gcnew System::EventHandler(this, &MyForm::CommonList_LeftMarkClick));
+			cms->MenuItems->Add("Unmark all from this category", gcnew System::EventHandler(this, &MyForm::CommonList_LeftUnmarkClick));
+			cms->Show(this, this->PointToClient(this->MousePosition));
+		}
+	}
+
+	private: string getCat(int i){
+		String^ a = this->currentCLB->GetItemText(this->currentCLB->Items[i]);
+		std::string b = msclr::interop::marshal_as<std::string>(a);
+		std::string c = "";
+		if (b.find("]") != string::npos) {
+			c = b.substr(1, b.find("]") - 1);
+		}
+		return c;
+	}
+
+	private: System::Void CommonList_LeftMarkClick(System::Object^ sender, System::EventArgs^ e) {
+		string x = getCat(currentSelectedInCLB);
+		if (x == "")
+			return;
+		int n = currentCLB->Items->Count;
+		for (int i = 0; i < n; i++) {
+			if (getCat(i) == x) {
+				currentCLB->SetItemChecked(i, true);
+			}
+		}
+	}
+
+	private: System::Void CommonList_LeftUnmarkClick(System::Object^ sender, System::EventArgs^ e) {
+		string x = getCat(currentSelectedInCLB);
+		if (x == "")
+			return;
+		int n = currentCLB->Items->Count;
+		for (int i = 0; i < n; i++) {
+			if (getCat(i) == x) {
+				currentCLB->SetItemChecked(i, false);
+			}
+		}
+	}
+
+	};
+
 }

@@ -4,6 +4,7 @@
 #include<list>
 #include<set>
 #include<vector>
+#include<queue>
 #include<stdio.h>
 
 using namespace std;
@@ -142,7 +143,14 @@ namespace toolSet {
 		bool inBracket;
 		char ch;
 
+		queue<string> waiting;
+
 		string next() {
+			if (waiting.size() != 0) {
+				string rrr = waiting.front();
+				waiting.pop();
+				return rrr;
+			}
 			if (ch == EOF)
 				return "";
 			string curr;
@@ -174,6 +182,11 @@ namespace toolSet {
 				return next();
 			}
 			curr = fix(curr);
+			if (curr == "<Item/>") {
+				waiting.push("_.");
+				waiting.push("</Item>");
+				curr = "<Item>";
+			}
 			if (curr == "")
 				return next();
 			return curr;
@@ -188,9 +201,29 @@ namespace toolSet {
 				cout << " ";
 			if (txt.find_last_of(";") != string::npos)
 				txt = txt.substr(txt.find_last_of(";") + 1, string::npos);
-			for (int i = 0; i < (int)txt.size(); i++) {
-				cout << txt[i];
-				if (txt[i] == '\n') {
+			string txtTemp = "";
+			size_t x, pos = 0;
+			while (x = txt.find("<Item>", pos), x != string::npos) {
+				bool ok = 1;
+				size_t i = x+6;
+				while (i < (size_t)txt.size() && txt[i] == ' ')
+					i++;
+				if (i < (size_t)txt.size() - 1 && txt[i] == '_' && txt[i + 1] == '.')
+					ok = 0;
+				if (ok) {
+					x += 5;
+					txtTemp += txt.substr(pos, x - pos + 1);
+				} else {
+					txtTemp += txt.substr(pos, x - pos);
+					x = txt.find("</Item>", i)+6;
+					txtTemp += "<Item/>";
+				}
+				pos = min(txt.size(), x+1);
+			}
+			txtTemp += txt.substr(pos, txt.size() - pos);
+			for (int i = 0; i < (int)txtTemp.size(); i++) {
+				cout << txtTemp[i];
+				if (txtTemp[i] == '\n') {
 					for (int j = 0; j < xtab; j++)
 						cout << " ";
 				}
@@ -201,6 +234,7 @@ namespace toolSet {
 		void printIf(sLi x) {
 			if (!flagOut)
 				return;
+			//cout << x.first << endl;
 			string handlingName = x.first.substr(0, x.first.find(";"));
 			SubHandlingData temp;
 			temp.first = handlingName;
@@ -360,6 +394,15 @@ namespace toolSet {
 				if (curr == ends) {
 					if (upToNow.find(";") != upToNow.size() - 1)
 						insertVarPrint(upToNow);
+					else if (upToNow.find(";") == upToNow.size() - 1 && needSubHandling[itrHNs] == 1) {
+						set<string> subsUsed;
+						insertVarPrint(upToNow);
+						printIf("<SubHandlingData>");
+						xtab += 2;
+						insertVarPrintExtra(upToNow, subsUsed);
+						xtab -= 2;
+						printIf("</SubHandlingData>");
+					}
 					xtab -= 2;
 					printIf(curr);
 					break;
@@ -433,6 +476,7 @@ namespace toolSet {
 		bool isFile1;
 
 		vector<string> handlingNames;
+		vector<bool> needSubHandling;
 		int itrHNs;
 
 		void run_FileIn(set<SubHandlingData> &All) {
@@ -493,6 +537,7 @@ namespace toolSet {
 
 		void run_F(set<SubHandlingData> &F, string in, string out) {
 			handlingNames.clear();
+			needSubHandling.clear();
 			itrHNs = -1;
 			ch = '$';
 			cin.clear();
@@ -501,6 +546,7 @@ namespace toolSet {
 				string curr = next();
 				if (curr == "<Item type=\"CHandlingData\">") {
 					handlingNames.push_back("");
+					needSubHandling.push_back(1);
 				}
 				if (curr == "<handlingName>") {
 					string b = next();
@@ -512,6 +558,8 @@ namespace toolSet {
 							handlingNames[handlingNames.size() - 1] = b;
 						}
 					}
+				} else if (curr == "<SubHandlingData>") {
+					needSubHandling[needSubHandling.size() - 1] = 0;
 				}
 			}
 			ch = '$';
@@ -1136,7 +1184,6 @@ namespace toolSet {
 		}
 
 		void setF2(string directory) {
-			freopen("aux", "w", stdout);
 			dirF2 = directory;
 			run_F(F2, directory, "");
 			uncommonVar();
