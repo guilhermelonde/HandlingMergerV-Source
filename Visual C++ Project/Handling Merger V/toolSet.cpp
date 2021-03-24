@@ -178,8 +178,20 @@ namespace toolSet {
 			if (ch == EOF)
 				return "";
 			if (curr.find("!--") != string::npos) {
-				inBracket = 1;
-				return next();
+				int ncr = curr.size();
+				if (!(curr[ncr - 3] == '-' && curr[ncr - 2] == '-' && curr[ncr - 1] == '>')) {
+					string nw = "";
+					while ((ch = getchar()) != EOF) {
+						if (ch == '>') {
+							int nnw = nw.size();
+							if (nnw >= 2 && nw[nnw - 1] == '-' && nw[nnw - 2] == '-')
+								break;
+						}
+						nw += ch;
+					}
+				}
+				curr = "";
+				inBracket = 0;
 			}
 			curr = fix(curr);
 			if (curr == "<Item/>") {
@@ -433,8 +445,6 @@ namespace toolSet {
 							continue;
 						} else if (curr == "</SubHandlingData>") {
 							break;
-						} else {
-							ok = 0;
 						}
 					}
 					insertVarPrintExtra(upToNow, subsUsed);
@@ -612,11 +622,11 @@ namespace toolSet {
 			VC["ALPHA"] = "SPORT";
 			VC["AMBULAN"] = "EMERGENCY";
 			VC["ANNIHL"] = "HELICOPTER";
-			VC["ARMYTRAILER"] = "UTILITY";
+			VC["ARMYTRAILER"] = "TRAILER";
 			VC["ASEA"] = "SEDAN";
 			VC["ASTEROPE"] = "SEDAN";
 			VC["BAGGER"] = "MOTORCYCLE";
-			VC["BALETRAILER"] = "UTILITY";
+			VC["BALETRAILER"] = "TRAILER";
 			VC["BALLER"] = "SUV";
 			VC["BALLER2"] = "SUV";
 			VC["BANSHEE"] = "SPORT";
@@ -638,7 +648,7 @@ namespace toolSet {
 			VC["BLISTA"] = "COMPACT";
 			VC["BLISTA2"] = "SPORT";
 			VC["BMX"] = "CYCLE";
-			VC["BOATTRAILER"] = "UTILITY";
+			VC["BOATTRAILER"] = "TRAILER";
 			VC["BOBCATXL"] = "VAN";
 			VC["BODHI2"] = "OFF_ROAD";
 			VC["BOXVILLE"] = "VAN";
@@ -676,7 +686,7 @@ namespace toolSet {
 			VC["DINGHY"] = "BOAT";
 			VC["DINGHY2"] = "BOAT";
 			VC["DLOADER"] = "OFF_ROAD";
-			VC["DOCKTRAILER"] = "UTILITY";
+			VC["DOCKTRAILER"] = "TRAILER";
 			VC["DOCKTUG"] = "UTILITY";
 			VC["DOMINATOR"] = "MUSCLE";
 			VC["DOMINATOR2"] = "MUSCLE";
@@ -717,7 +727,7 @@ namespace toolSet {
 			VC["GAUNTLET2"] = "MUSCLE";
 			VC["GBURRITO2"] = "VAN";
 			VC["GLENDALE"] = "SEDAN";
-			VC["GRAINTRAIL"] = "UTILITY";
+			VC["GRAINTRAIL"] = "TRAILER";
 			VC["GRANGER"] = "SUV";
 			VC["GRESLEY"] = "SUV";
 			VC["GUARDIAN"] = "INDUSTRIAL";
@@ -799,9 +809,9 @@ namespace toolSet {
 			VC["PREDATOR"] = "BOAT";
 			VC["PREMIER"] = "SEDAN";
 			VC["PRIMO"] = "SEDAN";
-			VC["PROPTRAILER"] = "UTILITY";
+			VC["PROPTRAILER"] = "TRAILER";
 			VC["RADI"] = "SUV";
-			VC["RAKETRAILER"] = "UTILITY";
+			VC["RAKETRAILER"] = "TRAILER";
 			VC["RANCHERXL"] = "OFF_ROAD";
 			VC["RAPIDGT"] = "SPORT";
 			VC["REBEL"] = "OFF_ROAD";
@@ -860,7 +870,7 @@ namespace toolSet {
 			VC["SWIFT"] = "HELICOPTER";
 			VC["TACO"] = "VAN";
 			VC["TAILGATE"] = "SEDAN";
-			VC["TANKER"] = "UTILITY";
+			VC["TANKER"] = "TRAILER";
 			VC["TAXI2"] = "SERVICE";
 			VC["TECHNICAL"] = "OFF_ROAD";
 			VC["THRUST"] = "MOTORCYCLE";
@@ -871,13 +881,13 @@ namespace toolSet {
 			VC["TOURBUS"] = "SERVICE";
 			VC["TOWTRUCK"] = "UTILITY";
 			VC["TOWTRUCK2"] = "UTILITY";
-			VC["TR2"] = "UTILITY";
-			VC["TR3"] = "UTILITY";
+			VC["TR2"] = "TRAILER";
+			VC["TR3"] = "TRAILER";
 			VC["TRACTOR"] = "UTILITY";
 			VC["TRACTOR2"] = "UTILITY";
-			VC["TRAILER"] = "UTILITY";
-			VC["TRAILERL"] = "UTILITY";
-			VC["TRAILERSMALL"] = "UTILITY";
+			VC["TRAILER"] = "TRAILER";
+			VC["TRAILERL"] = "TRAILER";
+			VC["TRAILERSMALL"] = "TRAILER";
 			VC["TRASH"] = "SERVICE";
 			VC["TRIBIKE"] = "CYCLE";
 			VC["TROPIC"] = "BOAT";
@@ -1054,10 +1064,10 @@ namespace toolSet {
 			VC["TORERO"] = "SPORT_CLASSIC";
 			VC["TORNADO5"] = "SPORT_CLASSIC";
 			VC["TORNADO6"] = "SPORT_CLASSIC";
-			VC["TRAILER2"] = "UTILITY";
-			VC["TRAILERLARGE"] = "UTILITY";
+			VC["TRAILER2"] = "TRAILER";
+			VC["TRAILERLARGE"] = "TRAILER";
 			VC["TRAILERSMALL2"] = "MILITARY";
-			VC["TRFLAT"] = "UTILITY";
+			VC["TRFLAT"] = "TRAILER";
 			VC["TROPHY"] = "OFF_ROAD";
 			VC["TROPHY2"] = "OFF_ROAD";
 			VC["TROPOS"] = "SPORT";
@@ -1170,6 +1180,83 @@ namespace toolSet {
 			VC["TULA"] = "PLANE";
 			VC["MESA3"] = "OFF_ROAD";
 			VC["TRASH2"] = "SERVICE";
+			VC["CARACARA2"] = "OFF_ROAD";
+			VC["DRAFTER"] = "SPORT";
+			VC["DYNASTY"] = "SPORT_CLASSIC";
+			VC["EMERUS"] = "SUPER";
+			VC["GAUNTLET3"] = "MUSCLE";
+			VC["GAUNTLET4"] = "MUSCLE";
+			VC["HELLION"] = "OFF_ROAD";
+			VC["ISSI7"] = "SPORT";
+			VC["JUGULAR"] = "SPORT";
+			VC["KRIEGER"] = "SUPER";
+			VC["LOCUST"] = "SPORT";
+			VC["NEBULA"] = "SPORT_CLASSIC";
+			VC["NEO"] = "SPORT";
+			VC["NOVAK"] = "SUV";
+			VC["PARAGON"] = "SPORT";
+			VC["PARAGON2"] = "SPORT";
+			VC["PEYOTE2"] = "MUSCLE";
+			VC["RROCKET"] = "MOTORCYCLE";
+			VC["S80"] = "SUPER";
+			VC["THRAX"] = "SUPER";
+			VC["ZION3"] = "SPORT_CLASSIC";
+			VC["ZORRUSSO"] = "SUPER";
+			VC["ALKONOST"] = "PLANE";
+			VC["ANNIHLATOR2"] = "HELICOPTER";
+			VC["ASBO"] = "COMPACT";
+			VC["AVISA"] = "BOAT";
+			VC["CLUB"] = "COMPACT";
+			VC["COQUETTE4"] = "SPORT";
+			VC["DINGHY5"] = "BOAT";
+			VC["DUKES3"] = "MUSCLE";
+			VC["EVERON"] = "OFF_ROAD";
+			VC["FORMULA"] = "OPEN_WHEEL";
+			VC["FORMULA2"] = "OPEN_WHEEL";
+			VC["FURIA"] = "SUPER";
+			VC["GAUNTLET5"] = "MUSCLE";
+			VC["GLENDALE2"] = "SEDAN";
+			VC["IMORGON"] = "SPORT";
+			VC["ITALIRSX"] = "SPORT";
+			VC["JB7002"] = "SPORT_CLASSIC";
+			VC["KANJO"] = "COMPACT";
+			VC["KOMODA"] = "SPORT";
+			VC["KOSATKA"] = "BOAT";
+			VC["LANDSTLKR2"] = "OFF_ROAD";
+			VC["LONGFIN"] = "BOAT";
+			VC["MANANA2"] = "SPORT_CLASSIC";
+			VC["MANCHEZ2"] = "MOTORCYCLE";
+			VC["MINITANK"] = "MILITARY";
+			VC["OPENWHEEL1"] = "OPEN_WHEEL";
+			VC["OPENWHEEL2"] = "OPEN_WHEEL";
+			VC["OUTLAW"] = "OFF_ROAD";
+			VC["PATROLBOAT"] = "BOAT";
+			VC["PENUMBRA2"] = "SPORT";
+			VC["PEYOTE3"] = "SPORT_CLASSIC";
+			VC["REBLA"] = "SUV";
+			VC["RETINUE2"] = "SPORT_CLASSIC";
+			VC["SEASPARROW2"] = "HELICOPTER";
+			VC["SEMINOLE2"] = "SUV";
+			VC["SLAMTRUCK"] = "UTILITY";
+			VC["SQUADDIE"] = "MILITARY";
+			VC["STRYDER"] = "MOTORCYCLE";
+			VC["SUGOI"] = "SPORT";
+			VC["SULTAN2"] = "SPORT";
+			VC["TIGON"] = "SUPER";
+			VC["TOREADOR"] = "SPORT_CLASSIC";
+			VC["VAGRANT"] = "OFF_ROAD";
+			VC["VERUS"] = "OFF_ROAD";
+			VC["VETIR"] = "MILITARY";
+			VC["VETO"] = "SPORT";
+			VC["VETO2"] = "SPORT";
+			VC["VSTR"] = "SPORT";
+			VC["WEEVIL"] = "COMPACT";
+			VC["WINKY"] = "OFF_ROAD";
+			VC["YOSEMITE2"] = "MUSCLE";
+			VC["YOSEMITE3"] = "MUSCLE";
+			VC["YOUGA3"] = "VAN";
+			VC["ZHABA"] = "OFF_ROAD";
+			VC["BRIOSO2"] = "COMPACT";
 		}
 
 		void setF1(string directory) {
