@@ -172,18 +172,18 @@ namespace HandlingMergerV {
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(158, 26);
 			this->label1->TabIndex = 0;
-			this->label1->Text = L"Select the file with your modified handling data:";
+			this->label1->Text = L"Select the file with the modified handling data to retrieve:";
 			this->label1->TextAlign = System::Drawing::ContentAlignment::MiddleLeft;
 			// 
 			// label2
 			// 
 			this->label2->AutoSize = true;
 			this->label2->Location = System::Drawing::Point(451, 37);
-			this->label2->MaximumSize = System::Drawing::Size(160, 0);
+			this->label2->MaximumSize = System::Drawing::Size(170, 0);
 			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(160, 26);
+			this->label2->Size = System::Drawing::Size(170, 26);
 			this->label2->TabIndex = 1;
-			this->label2->Text = L"Select the handling.meta file you already use in your GTA V:";
+			this->label2->Text = L"Select the handling.meta file that will receive modded handling data:";
 			this->label2->TextAlign = System::Drawing::ContentAlignment::MiddleLeft;
 			// 
 			// SelectMod
@@ -358,8 +358,8 @@ namespace HandlingMergerV {
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(109, 135);
 			this->label3->TabIndex = 12;
-			this->label3->Text = L"The vehicles that are on the file with your handling mod but not on the first lis"
-				L"t, also as the variables on the second list, can be found in \"Add Options\" tab";
+			this->label3->Text = L"The vehicles or variables on the file with modified handling data that are not on"
+				L" some of these list may be found in \"Add Options\" tab.";
 			this->label3->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// groupBox2
@@ -479,13 +479,13 @@ namespace HandlingMergerV {
 			this->label5->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->label5->ForeColor = System::Drawing::Color::Black;
-			this->label5->Location = System::Drawing::Point(251, 274);
+			this->label5->Location = System::Drawing::Point(251, 260);
 			this->label5->MaximumSize = System::Drawing::Size(130, 0);
 			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(127, 60);
+			this->label5->Size = System::Drawing::Size(127, 75);
 			this->label5->TabIndex = 17;
-			this->label5->Text = L"The variables above are only in the file with your handling mod for the vehicles "
-				L"at left.";
+			this->label5->Text = L"The variables above are only in the file with modified handling mod for the vehic"
+				L"les specified at left.";
 			this->label5->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// UncommonVarVar
@@ -495,7 +495,7 @@ namespace HandlingMergerV {
 			this->UncommonVarVar->FormattingEnabled = true;
 			this->UncommonVarVar->Location = System::Drawing::Point(248, 44);
 			this->UncommonVarVar->Name = L"UncommonVarVar";
-			this->UncommonVarVar->Size = System::Drawing::Size(238, 229);
+			this->UncommonVarVar->Size = System::Drawing::Size(238, 214);
 			this->UncommonVarVar->TabIndex = 1;
 			// 
 			// UncommonVarVehicles
@@ -521,8 +521,8 @@ namespace HandlingMergerV {
 			this->label4->Name = L"label4";
 			this->label4->Size = System::Drawing::Size(840, 13);
 			this->label4->TabIndex = 13;
-			this->label4->Text = L"An incorrect addition may cause a crash while the game is loading. Know what you "
-				L"are doing!";
+			this->label4->Text = L"Add incompatible data may cause crashes in the game. Sometimes an updated gamecon"
+				L"fig.xml mod is needed.";
 			this->label4->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// groupBox3
@@ -550,8 +550,8 @@ namespace HandlingMergerV {
 			this->label7->Name = L"label7";
 			this->label7->Size = System::Drawing::Size(95, 120);
 			this->label7->TabIndex = 16;
-			this->label7->Text = L"Here are the vehicles found on the file with your handling mod but not in the bas"
-				L"is handling.meta you already use.";
+			this->label7->Text = L"Here are the vehicles found on the file with your modified handling data but not "
+				L"in the handling.meta that will receive mods.";
 			this->label7->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// UncommonList
@@ -652,14 +652,17 @@ namespace HandlingMergerV {
 		}
 #pragma endregion
 
-	private: void openF1(String^ dir) {
+	private: void openF1(String^ dir, bool printLogs) {
 		if (dir == "")
 			return;
 		this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
 		DirF1->Text = dir;
 		CommonList->Items->Clear();
 		std::string dirS = msclr::interop::marshal_as<std::string>(dir);
-		MTObj.setF1(dirS);
+		bool success = MTObj.setF1(dirS, printLogs);
+		if (!success && printLogs) {
+			MessageBox::Show("Fatal error in the selected file. Check \"Handling Merger V logs.txt\" for details.", "Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		}
 		std::list<std::string> L = MTObj.common();
 		while (!L.empty()) {
 			String^ i = gcnew String(L.front().c_str());
@@ -699,20 +702,23 @@ namespace HandlingMergerV {
 
 	private: System::Void SelectMod_Click(System::Object^ sender, System::EventArgs^ e) {
 		OpenFileDialog^ O = gcnew OpenFileDialog;
-		O->Title = "Select the file with your handling data";
+		O->Title = "Select the file with the modified handling data to retrieve";
 		O->ShowDialog();
 		String^ dir = O->FileName;
-		openF1(dir);
+		openF1(dir, 1);
 	}
 
-	private: void openF2(String^ dir) {
+	private: void openF2(String^ dir, bool printLogs) {
 		if (dir == "")
 			return;
 		this->Cursor = System::Windows::Forms::Cursors::WaitCursor;
 		DirF2->Text = dir;
 		CommonList->Items->Clear();
 		std::string dirS = msclr::interop::marshal_as<std::string>(dir);
-		MTObj.setF2(dirS);
+		bool success = MTObj.setF2(dirS, printLogs);
+		if (!success && printLogs) {
+			MessageBox::Show("Fatal error in the selected file. Check \"Handling Merger V logs.txt\" for details.", "Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		}
 		std::list<std::string> L = MTObj.common();
 		while (!L.empty()) {
 			String^ i = gcnew String(L.front().c_str());
@@ -745,10 +751,10 @@ namespace HandlingMergerV {
 
 	private: System::Void SelectHandling_Click(System::Object^ sender, System::EventArgs^ e) {
 		OpenFileDialog^ O = gcnew OpenFileDialog;
-		O->Title = "Select the handling.meta you already use";
+		O->Title = "Select the handling.meta file that will receive modded handling data";
 		O->ShowDialog();
 		String^ dir = O->FileName;
-		openF2(dir);
+		openF2(dir, 1);
 	}
 	private: System::Void SelectAll_Click(System::Object^ sender, System::EventArgs^ e) {
 		int n = CommonList->Items->Count;
@@ -783,10 +789,10 @@ namespace HandlingMergerV {
 		UncommonList->Items->Clear();
 		UncommonVarVar->Items->Clear();
 		UncommonVarVehicles->Items->Clear();
-		openF1(DirF1->Text);
-		openF2(DirF2->Text);
+		openF1(DirF1->Text, 0);
+		openF2(DirF2->Text, 0);
 		this->Cursor = System::Windows::Forms::Cursors::Default;
-		MessageBox::Show("Merged!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		MessageBox::Show("Replaced!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
 	}
 	private: System::Void MyForm_Load(System::Object^ sender, System::EventArgs^ e) {
 	}
@@ -829,8 +835,8 @@ namespace HandlingMergerV {
 		UncommonList->Items->Clear();
 		UncommonVarVar->Items->Clear();
 		UncommonVarVehicles->Items->Clear();
-		openF1(DirF1->Text);
-		openF2(DirF2->Text);
+		openF1(DirF1->Text, 0);
+		openF2(DirF2->Text, 0);
 		this->Cursor = System::Windows::Forms::Cursors::Default;
 		MessageBox::Show("Added!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
 	}
@@ -879,8 +885,8 @@ namespace HandlingMergerV {
 		UncommonList->Items->Clear();
 		UncommonVarVar->Items->Clear();
 		UncommonVarVehicles->Items->Clear();
-		openF1(DirF1->Text);
-		openF2(DirF2->Text);
+		openF1(DirF1->Text, 0);
+		openF2(DirF2->Text, 0);
 		this->Cursor = System::Windows::Forms::Cursors::Default;
 		MessageBox::Show("Added!", "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
 	}
@@ -928,7 +934,7 @@ namespace HandlingMergerV {
 		}
 	}
 
-	private: string getCat(int i){
+	private: string getCat(int i) {
 		String^ a = this->currentCLB->GetItemText(this->currentCLB->Items[i]);
 		std::string b = msclr::interop::marshal_as<std::string>(a);
 		std::string c = "";

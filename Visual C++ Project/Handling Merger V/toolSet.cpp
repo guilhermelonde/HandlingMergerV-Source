@@ -5,6 +5,7 @@
 #include<set>
 #include<vector>
 #include<queue>
+#include<utility>
 #include<stdio.h>
 
 using namespace std;
@@ -40,9 +41,13 @@ namespace toolSet {
 		set<string> AllowedVar;
 		set<string> AllowedVeh;
 		set<string> AllowedInsertionVeh;
+		string logsIn, partialLogsIn, logsSuccessIn, logsUnsuccessIn;
+		string logsMerge;
+		string logsPrepareInsert;
+
 
 		bool chnmb(char x) {
-			return (tolower(x) >= 'a' && tolower(x) <= 'z') || (x >= '0' && x <= '9') || x == '-' || x == '.' || x == '_';
+			return (tolower(x) >= 'a' && tolower(x) <= 'z') || (x >= '0' && x <= '9') || x == '-' || x == '.' || x == '_' || x == '!';
 		}
 
 		string firstId(string in) {
@@ -142,6 +147,9 @@ namespace toolSet {
 		int xtab;
 		bool inBracket;
 		char ch;
+		int lineCount;
+		int lastScopeLine;
+		int lineOutCount;
 
 		queue<string> waiting;
 
@@ -151,45 +159,57 @@ namespace toolSet {
 				waiting.pop();
 				return rrr;
 			}
-			if (ch == EOF)
+			if (ch == EOF) {
 				return "";
+			}
+
 			string curr;
 			if (inBracket) {
 				curr = "<";
+				bool asdf = 0;
 				while ((ch = getchar()) != EOF) {
-					if (ch == '<')
-						curr = "<";
-					else if (ch == '>') {
+					if (ch == '>') {
 						curr += ch;
 						break;
 					}
 					else {
-						curr += ch;
+						if (ch == '\n')
+							lineCount++;
+						if (ch != '<')
+							curr += ch;
 					}
 				}
 				inBracket = 0;
 			}
 			else {
 				while ((ch = getchar()) != EOF && ch != '<') {
+					if (ch == '\n')
+						lineCount++;
 					curr += ch;
 				}
 				inBracket = 1;
 			}
-			if (ch == EOF)
+			if (ch == EOF) {
 				return "";
+			}
+			//partialLogsIn += "li: " + curr + " " + to_string(inBracket) + "\n";
 			if (curr.find("!--") != string::npos) {
+				partialLogsIn += to_string(lineCount) + " -- ";
 				int ncr = curr.size();
+				string nw = "";
 				if (!(curr[ncr - 3] == '-' && curr[ncr - 2] == '-' && curr[ncr - 1] == '>')) {
-					string nw = "";
 					while ((ch = getchar()) != EOF) {
 						if (ch == '>') {
 							int nnw = nw.size();
 							if (nnw >= 2 && nw[nnw - 1] == '-' && nw[nnw - 2] == '-')
 								break;
 						}
+						else if (ch == '\n')
+							lineCount++;
 						nw += ch;
 					}
 				}
+				partialLogsIn += to_string(lineCount) + " [WARNING] Comments will not pass after merge\n";
 				curr = "";
 				inBracket = 0;
 			}
@@ -236,17 +256,18 @@ namespace toolSet {
 			for (int i = 0; i < (int)txtTemp.size(); i++) {
 				cout << txtTemp[i];
 				if (txtTemp[i] == '\n') {
+					lineOutCount++;
 					for (int j = 0; j < xtab; j++)
 						cout << " ";
 				}
 			}
 			cout << endl;
+			lineOutCount++;
 		}
 
 		void printIf(sLi x) {
 			if (!flagOut)
 				return;
-			//cout << x.first << endl;
 			string handlingName = x.first.substr(0, x.first.find(";"));
 			SubHandlingData temp;
 			temp.first = handlingName;
@@ -338,6 +359,7 @@ namespace toolSet {
 			string s_cum;
 			list<string> l_cum;
 			string curr;
+			int llineCount = lineCount;
 			while (ch != EOF) {
 				s_cum += "\n";
 				curr = next();
@@ -396,14 +418,24 @@ namespace toolSet {
 				l_cum_o.push_back(l_cum.front());
 				l_cum.pop_front();
 			}
-			return curr == ends;
+			if (curr != ends) {
+				partialLogsIn += to_string(llineCount) + " -- " + to_string(lineCount) + " [FATAL ERROR] Unclosed expression.\n";
+				return 0;
+			}
+			return 1;
 		}
 
 		bool tokenize_FileIn(string ends, string upToNow, map<string, liS> &write) {
 			string curr;
+			bool closing = 0;
+			int llineCount = lineCount;
+			bool things = 0;
 			while (ch != EOF) {
 				curr = next();
 				if (curr == ends) {
+					if (things == 0) {
+						partialLogsIn += to_string(llineCount) + " -- " + to_string(lineCount) + " [WARNING] Empty subhandling space.\n";
+					}
 					if (upToNow.find(";") != upToNow.size() - 1)
 						insertVarPrint(upToNow);
 					else if (upToNow.find(";") == upToNow.size() - 1 && needSubHandling[itrHNs] == 1) {
@@ -417,6 +449,7 @@ namespace toolSet {
 					}
 					xtab -= 2;
 					printIf(curr);
+					closing = 1;
 					break;
 				}
 				if (curr == "<SubHandlingData>") {
@@ -425,8 +458,10 @@ namespace toolSet {
 					printIf(curr);
 					xtab += 2;
 					bool ok = 1;
+					things = 1;
 					map<string, int> cnt;
 					set<string> subsUsed;
+					int llineCount2 = lineCount;
 					while(ok){
 						string aux = next();
 						sLi y = betQuotes(aux);
@@ -445,6 +480,11 @@ namespace toolSet {
 							continue;
 						} else if (curr == "</SubHandlingData>") {
 							break;
+						} else if (ch == EOF){
+							ok = 0;
+							partialLogsIn += to_string(llineCount2) + " -- " + to_string(lineCount) + " [FATAL ERROR] Unclosed expression.\n";
+						} else {
+							partialLogsIn += to_string(lineCount) + " [WARNING] Anomaly found. It is supposed to be something like <Item type=\"?\"/>. It will be ignored for safe.\n";
 						}
 					}
 					insertVarPrintExtra(upToNow, subsUsed);
@@ -455,8 +495,8 @@ namespace toolSet {
 					printIf(curr);
 					if (!ok || curr != "</SubHandlingData>")
 						return 0;
-				}
-				else if (curr.size() > 3) {
+				} else if (curr.size() > 2 && curr[0] == '<' && curr[curr.size()-1] == '>') {
+					things = 1;
 					sLi x;
 					if (curr.find("/>") != string::npos) {
 						x = betQuotes(curr);
@@ -478,38 +518,61 @@ namespace toolSet {
 					printIf(make_pair(upToNow + x.first, x.second));
 					if (x.first != "<handlingName>$</handlingName>")
 						write[upToNow + x.first] = x.second;
+				} else {
+					partialLogsIn += to_string(lineCount-1) + " [WARNING] Unknown token will be ignored.\n";
 				}
+			}
+			if (closing == 0) {
+				partialLogsIn += to_string(llineCount) + " -- " + to_string(lineCount) + " [FATAL ERROR] Unclosed expression.\n";
 			}
 			return curr == ends;
 		}
 
 		bool isFile1;
+		bool isPreparing;
 
 		vector<string> handlingNames;
 		vector<bool> needSubHandling;
 		int itrHNs;
+		int linesOutCummulative;
 
-		void run_FileIn(set<SubHandlingData> &All) {
+		bool run_FileIn(set<SubHandlingData> &All) {
 			string curr;
+			bool result = 1;
+			inBracket = 0;
 			while (ch != EOF) {
 				xtab = 0;
+				int llineCount = lineCount;
 				curr = next();
-				if (curr == "<HandlingData>" || curr == "</HandlingData>")
+				bool inContext = 0;
+				if (curr.size() >= 2 && curr[0] == '<')
+					inContext = 1;
+				if (curr == "<HandlingData>" || curr == "</HandlingData>") {
 					xtab = 2;
-				if (curr == "<Item type=\"CHandlingData\">" || curr == "</Item>")
+				} else if (curr == "<Item type=\"CHandlingData\">" || curr == "</Item>") {
 					xtab = 4;
-				printIf(curr);
-				if (curr != "<Item type=\"CHandlingData\">")
+				}
+				if (isPreparing && (curr == "</HandlingData>" || curr == "</CHandlingDataMgr>"))
 					continue;
+				if (inContext)
+					printIf(curr);
+				if (curr != "<Item type=\"CHandlingData\">") {
+					if (inContext == 0 && ch != EOF) {
+						logsIn += to_string(llineCount) + " -- " + to_string(lineCount) + " [WARNING] Out of context lines.\n\n";
+					}
+					continue;
+				}
 				xtab += 2;
 				itrHNs++;
 				string handlingName = handlingNames[itrHNs];
 				if (handlingName == "") {
 					xtab -= 2;
+					logsIn += to_string(lineCount) + " [WARNING] Handling data without handling name.\n\n";
 					continue;
 				}
+				partialLogsIn = "";
 				bool specialCase = 0;
-				if (AllowedInsertionVeh.find(handlingName) != AllowedInsertionVeh.end()) {
+				if (flagOut == 0 && AllowedInsertionVeh.find(handlingName) != AllowedInsertionVeh.end()) {
 					specialCase = 1;
 					flagOut = 1;
 					xtab -= 2;
@@ -519,6 +582,10 @@ namespace toolSet {
 				SubHandlingData shd;
 				shd.first = handlingName;
 				string logLoaded;
+				bool success = 0;
+				llineCount = lineCount;
+				int llineOutCount = lineOutCount;
+
 				if (tokenize_FileIn("</Item>", handlingName + ";", shd.second)) {
 					if (!flagOut) {
 						All.insert(shd);
@@ -535,26 +602,59 @@ namespace toolSet {
 							cout << join(make_pair(F, it->second)) << endl;
 						}*/
 					}
+					success = 1;
 				}
 				else {
 					xtab -= 2;
+					partialLogsIn += "Not loaded.\n\n";
+					result = 0;
+				}
+				if (success)
+					logsSuccessIn += handlingName + "\n";
+				else
+					logsUnsuccessIn += handlingName + "\n";
+				if (partialLogsIn.size() > 0) {
+					logsIn += "------- Handling data of " + handlingName + "\n" + partialLogsIn;
+					if (success) {
+						logsIn += "Loaded successfully.\n\n";
+					}
+				}
+				if (flagOut) {
+					int diff = (lineOutCount - llineOutCount) - (lineCount - llineCount);
+					if (diff) {
+						if (diff > 0)
+							logsMerge += "+";
+						logsMerge += to_string(diff) + " for " + handlingName + " in [" + to_string(llineOutCount+linesOutCummulative) + " -- " + to_string(lineOutCount+linesOutCummulative) + "]\n\n";
+					}
+					lastScopeLine = lineCount;
 				}
 				if (specialCase) {
 					flagOut = 0;
 				}
 			}
+			return result;
 		}
 
-		void run_F(set<SubHandlingData> &F, string in, string out) {
+		bool run_F(set<SubHandlingData> &F, string in, string out) {
 			handlingNames.clear();
 			needSubHandling.clear();
 			itrHNs = -1;
 			ch = '$';
 			cin.clear();
+			lineCount = 1;
+			logsIn = "";
+			logsMerge = "";
+			logsSuccessIn = "";
+			logsUnsuccessIn = "";
+			lineOutCount = 0;
+			lastScopeLine = 1;
+			inBracket = 0;
+			int llineCount = 1;
 			freopen(in.c_str(), "r", stdin);
 			while (ch != EOF) {
 				string curr = next();
 				if (curr == "<Item type=\"CHandlingData\">") {
+					llineCount = lineCount;
 					handlingNames.push_back("");
 					needSubHandling.push_back(1);
 				}
@@ -568,7 +668,7 @@ namespace toolSet {
 							handlingNames[handlingNames.size() - 1] = b;
 						}
 					}
-				} else if (curr == "<SubHandlingData>") {
+				} else if (curr == "<SubHandlingData>" && handlingNames.size() > 0) {
 					needSubHandling[needSubHandling.size() - 1] = 0;
 				}
 			}
@@ -578,11 +678,13 @@ namespace toolSet {
 			freopen(in.c_str(), "r", stdin);
 			if (out != "")
 				freopen((out + ".temp").c_str(), "w", stdout);
-			run_FileIn(F);
+			lineCount = 1;
+			bool result = run_FileIn(F);
 			cin.clear();
 			freopen("aux", "r", stdin);
-			if (out != "")
+			if (out != "" && !isPreparing)
 				freopen("aux", "w", stdout);
+			return result;
 		}
 
 		void uncommonVar() {
@@ -608,6 +710,76 @@ namespace toolSet {
 			}
 		}
 
+		void printLogsIn(string dirF, int success) {
+			freopen("Handling Merger V logs.txt", "w", stdout);
+			int hns = handlingNames.size();
+			cout << "--------------------------INPUT LOGS--------------------------\n\n";
+			cout << "File loaded: " << dirF << "\n";
+			cout << "Lines loaded: " << lineCount << "\n";
+			cout << "Handlings loaded successfully: " << success << "\n";
+			cout << "Handlings not loaded: " << hns - success << "\n\n";
+			cout << "----------------------LOADED SUCCESSFULLY---------------------\n\n";
+			cout << logsSuccessIn << "\n";
+			cout << "--------------------------NOT LOADED--------------------------\n\n";
+			cout << logsUnsuccessIn;
+			for (int k = itrHNs + 1; k < hns; k++) {
+				cout << handlingNames[k] + "\n";
+			}
+			cout << "\n";
+			cout << "----------------------------ISSUES----------------------------\n\n";
+			cout << "# For any [WARNING] a manual fix is is not mandatory, the tool will fix it automatically.\n";
+			cout << "# For any [FATAL ERROR] a manual fix is mandatory. If it is not fixed several vehicles will\nnot be loaded.\n";
+			cout << "# Not all errors may be listed here, so take care of what kind of handling mod you are opening.\n\n";
+			cout << logsIn;
+			for (int k = itrHNs + 1; k < hns; k++) {
+				cout << "------- Handling data of " + handlingNames[k] + "\n" + "Not loaded. Check for previous problems.\n\n";
+			}
+			freopen("aux", "w", stdout);
+		}
+
+		void printLogsMerge(string dirF) {
+			freopen("Handling Merger V logs.txt", "w", stdout);
+			int hns = handlingNames.size();
+			cout << "--------------------------MERGE LOGS---------------------------\n\n";
+			cout << "File modified: " << dirF << "\n";
+			cout << "Lines before merge: " << lineCount << "\n";
+			cout << "Lines after merge: " << lineOutCount << "\n";
+			cout << "Number of vehicles set for merged: " << AllowedVeh.size() << "\n";
+			cout << "Number of variable types set for merge: " << AllowedVar.size() << "\n";
+			cout << "Number of variables set for add: " << AllowedInsertionVar.size() << "\n";
+			cout << "\n--------------------------Differences -------------------------\n\n";
+			cout << "# Show the non zero differences (after - before) on the number of lines before and after merge\nin the receiver file\n\n";
+			cout << logsMerge;
+			freopen("aux", "w", stdout);
+		}
+
+		void preparingLogs(string dirF) {
+			logsPrepareInsert = "";
+			logsPrepareInsert += "--------------------------FIXING LOGS--------------------------\n\n";
+			logsPrepareInsert += "# This fixing is needed to adjust indentation and ignore small issues in the file that receives\nnew vehicles.\n\n";
+			logsPrepareInsert += "File being fixed: " + dirF + "\n";
+			logsPrepareInsert += "Lines before fix: " + to_string(lineCount) + "\n";
+			logsPrepareInsert += "Lines after fix: " + to_string(lineOutCount+2) + "\n\n";
+			logsPrepareInsert += "--------------------------Differences--------------------------\n\n";
+			logsPrepareInsert += "# Show the non zero differences (after - before) on the number of lines before and after fix\nthe receiver file\n\n";
+			logsPrepareInsert += logsMerge + "\n";
+		}
+
+		void printLogsInsertVehicles(string dirF) {
+			freopen("Handling Merger V logs.txt", "w", stdout);
+			cout << logsPrepareInsert;
+			cout << "--------------------------INSERT LOGS--------------------------\n\n";
+			cout << "File being retrieved: " << dirF << "\n";
+			cout << "Lines retrieved: " << lineCount << "\n";
+			cout << "Lines inserted in the receiver: " << lineOutCount << "\n";
+			cout << "Final number of lines in the receiver: " << (linesOutCummulative + lineOutCount) << "\n";
+			cout << "Number of vehicles set to insert: " << AllowedInsertionVeh.size() << "\n\n";
+			cout << "--------------------------Differences--------------------------\n\n";
+			cout << "# Show the non zero differences (added - ignored) on the number of lines that was added and\nignored in the data inserted in the receiver file.\n\n";
+			cout << logsMerge;
+			freopen("aux", "w", stdout);
+		}
+
 	public:
 
 		MainTool() {
@@ -615,6 +787,7 @@ namespace toolSet {
 			flagOut = 0;
 			xtab = 0;
 			isFile1 = 0;
+			linesOutCummulative = 0;
 			VC["ADDER"] = "SUPER";
 			VC["AIRBUS"] = "SERVICE";
 			VC["AIRTUG"] = "UTILITY";
@@ -767,7 +940,7 @@ namespace toolSet {
 			VC["MARSHALL"] = "OFF_ROAD";
 			VC["MASSACRO"] = "SPORT";
 			VC["MAVERICK"] = "HELICOPTER";
-			VC["MESA"] = "OFF_ROAD";
+			VC["MESA"] = "SUV";
 			VC["METROTRAIN"] = "RAIL";
 			VC["MILJET"] = "PLANE";
 			VC["MINIVAN"] = "VAN";
@@ -917,7 +1090,7 @@ namespace toolSet {
 			VC["BALLER4"] = "SUV";
 			VC["BALLER5"] = "SUV";
 			VC["BALLER6"] = "SUV";
-			VC["BANSHEE2"] = "SPORT";
+			VC["BANSHEE2"] = "SUPER";
 			VC["BARRAGE"] = "MILITARY";
 			VC["BESTIAGTS"] = "SPORT";
 			VC["BF400"] = "MOTORCYCLE";
@@ -1222,7 +1395,7 @@ namespace toolSet {
 			VC["KANJO"] = "COMPACT";
 			VC["KOMODA"] = "SPORT";
 			VC["KOSATKA"] = "BOAT";
-			VC["LANDSTLKR2"] = "OFF_ROAD";
+			VC["LANDSTLKR2"] = "SUV";
 			VC["LONGFIN"] = "BOAT";
 			VC["MANANA2"] = "SPORT_CLASSIC";
 			VC["MANCHEZ2"] = "MOTORCYCLE";
@@ -1238,7 +1411,7 @@ namespace toolSet {
 			VC["SEASPARROW2"] = "HELICOPTER";
 			VC["SEMINOLE2"] = "SUV";
 			VC["SLAMTRUCK"] = "UTILITY";
-			VC["SQUADDIE"] = "MILITARY";
+			VC["SQUADDIE"] = "SUV";
 			VC["STRYDER"] = "MOTORCYCLE";
 			VC["SUGOI"] = "SPORT";
 			VC["SULTAN2"] = "SPORT";
@@ -1259,21 +1432,28 @@ namespace toolSet {
 			VC["BRIOSO2"] = "COMPACT";
 		}
 
-		void setF1(string directory) {
+		bool setF1(string directory, bool printLogs = 0) {
 			freopen("aux", "w", stdout);
 			ch = '$';
 			dirF1 = directory;
 			isFile1 = 1;
 			Var.clear();
-			run_F(F1, directory, "");
+			bool result = run_F(F1, directory, "");
 			isFile1 = 0;
+			if (printLogs)
+				printLogsIn(dirF1, F1.size());
 			uncommonVar();
+			return result;
 		}
 
-		void setF2(string directory) {
+		bool setF2(string directory, bool printLogs = 0) {
 			dirF2 = directory;
-			run_F(F2, directory, "");
+			freopen("aux", "w", stdout);
+			bool result = run_F(F2, directory, "");
+			if (printLogs)
+				printLogsIn(dirF2, F2.size());
 			uncommonVar();
+			return result;
 		}
 
 		list<string> common() {
@@ -1352,6 +1532,7 @@ namespace toolSet {
 			}
 			flagOut = 1;
 			run_F(F2, dirF2, dirF2);
+			printLogsMerge(dirF2);
 			flagOut = 0;
 			remove(dirF2.c_str());
 			F2.clear();
@@ -1381,23 +1562,26 @@ namespace toolSet {
 			}
 			cin.clear();
 			freopen(dirF2.c_str(), "r", stdin);
-			freopen((dirF2 + ".temp").c_str(), "w", stdout);
-			while (!cin.eof()) {
-				string curr;
-				getline(cin, curr);
-				if (fix(curr) != "</HandlingData>" && fix(curr) != "</CHandlingDataMgr>" && fix(curr) != "") {
-					cout << curr << endl;
-				}
-			}
+			AllowedVar.clear();
+			AllowedVeh.clear();
+			flagOut = 1;
+			isPreparing = 1;
 			set<SubHandlingData> Fnothing;
+			run_F(Fnothing, dirF2, dirF2);
+			linesOutCummulative = lineOutCount;
+			flagOut = 0;
+			isPreparing = 0;
+			preparingLogs(dirF2);
 			run_F(Fnothing, dirF1, "");
 			cout << "  </HandlingData>\n";
-			cout << "</CHandlingDataMgr>\n";
+			cout << "</CHandlingDataMgr>";
 			fflush(stdout);
 			freopen("aux", "a", stdout);
 			remove(dirF2.c_str());
 			F2.clear();
 			int arg = rename((dirF2 + ".temp").c_str(), dirF2.c_str());
+			printLogsInsertVehicles(dirF1);
+			linesOutCummulative = 0;
 			dirF2 = "";
 			F1.clear();
 			dirF1 = "";
